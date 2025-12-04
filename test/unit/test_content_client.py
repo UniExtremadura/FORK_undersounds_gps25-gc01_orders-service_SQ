@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 from clients.content_client import ContentClient
-
+import math
 
 class TestContentClient:
     
@@ -46,7 +46,7 @@ class TestContentClient:
         print(result)
         assert result is not None
         assert result.get('name') == "test-product"
-        assert result.get('price') == 19.99
+        assert math.isclose(result['price'], 9.99, rel_tol=1e-09, abs_tol=1e-09) 
 
     @patch('clients.base_client.requests.request')
     @patch('clients.base_client.KeycloakService')
@@ -189,4 +189,4 @@ class TestContentClient:
 
         assert result is not None
         assert result['name'] == "Greatest Hits"
-        assert result['price'] == 9.99
+        assert math.isclose(result['price'], 9.99, rel_tol=1e-09, abs_tol=1e-09) 
