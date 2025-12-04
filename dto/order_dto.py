@@ -1,7 +1,7 @@
 from datetime import date
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from model.order_model_ import OrderStatus
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal, List
 
 class BuyerDTO(BaseModel):
@@ -61,7 +61,7 @@ class OrderResponseDTO(BaseModel):
 
                # Management of created_at
                if order.created_at is None:
-                    created_at_str = datetime.utcnow().isoformat() + 'Z'
+                    created_at_str = datetime.now(timezone.utc)
                elif hasattr(order.created_at, 'isoformat'):
                     created_at_str = order.created_at.isoformat() + 'Z'
                else:

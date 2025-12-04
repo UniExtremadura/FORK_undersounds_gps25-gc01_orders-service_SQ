@@ -7,10 +7,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+# Constantes para indicar el tipo de error
+_noconnect = 'Error al conectar con el servicio de pagos'
+_timeout = 'Timeout en el servicio de pagos'
+_unresolved = 'Error desconocido en el servicio de pagos'
+
 class PaymentClient(BaseClient):
     def __init__(self, app):
         super().__init__(app, "payment-service")
-        #self.service_name = "payment-service"  # Nombre que tiene registrado Eureka para el microservicio de usuarios
         self.base_url = app.config.get('PAYMENT_SERVICE_URL')
         self.timeout = 5
     
@@ -50,7 +54,7 @@ class PaymentClient(BaseClient):
                     logger.error(f"Error en pago: {response.status_code} - {response.text}")
                     return {
                         'success': False,
-                        'error': response.json().get('error', 'Error desconocido en el servicio de pagos'),
+                        'error': response.json().get('error', _unresolved),
                         'status_code': response.status_code
                     }
                 
@@ -58,13 +62,13 @@ class PaymentClient(BaseClient):
             logger.error(f"Error de conexión con el servicio de pagos: {str(e)}")
             return {
                 'success': False,
-                'error': 'No se pudo conectar con el servicio de pagos'
+                'error': _noconnect
             }
         except requests.exceptions.Timeout as e:
             logger.error(f"Timeout en servicio de pagos: {str(e)}")
             return {
                 'success': False,
-                'error': 'Timeout en el servicio de pagos'
+                'error': _timeout
             }
         except Exception as e:
             logger.error(f"Error inesperado en pago: {str(e)}")
@@ -102,7 +106,7 @@ class PaymentClient(BaseClient):
                 logger.error(f"Error consultando el pago: {purchase_id}")
                 return {
                     'success': False,
-                    'error': response.json().get('error', 'Error desconocido en el servicio de pagos'),
+                    'error': response.json().get('error', _unresolved),
                     'status_code': response.status_code
                 }
             
@@ -116,7 +120,7 @@ class PaymentClient(BaseClient):
             logger.error(f"Timeout en servicio de pagos: {str(e)}")
             return {
                 'success': False,
-                'error': 'Timeout en el servicio de pagos'
+                'error': _unresolved
             }
         except Exception as e:
             logger.error(f"Error inesperado en pago: {str(e)}")
